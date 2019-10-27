@@ -16,7 +16,7 @@ x=50
 y=360
 gx=0
 gy=y+95-19
-g=10
+g=12
 over=False
 y_change=0
 g1=200
@@ -50,6 +50,8 @@ cactus_height=temp_vars[1]
 cactus_score_present=1
 cactus_lock=threading.Lock()
 cy=gy-cactus_height+7
+jump_sound = pygame.mixer.Sound('jump.wav')
+die_sound = pygame.mixer.Sound('die.wav')
 # print random.randint(0,3)
 # temp_vars=dinoImg.get_size()
 # print temp_vars[1]
@@ -66,7 +68,7 @@ def reset():
 	y=360
 	gx=0
 	gy=y+95-19
-	g=10
+	g=12
 	over=False
 	y_change=0
 	g1=200
@@ -126,6 +128,7 @@ def T_Rex():
 				if event.key==pygame.K_SPACE:
 					y_change=-g
 					up=True
+					jump_sound.play()
 					count=0
 				elif event.key==pygame.K_p:
 					pause_game()
@@ -198,6 +201,7 @@ def collision(x1,y1,x2,y2):
 	if x1+88-30<x2 or x1>x2+cactus_width-23 or y1+95-23<y2:
 		return False
 	else:
+		die_sound.play()
 		return True	
 
 def text_objects(text, font):
@@ -375,21 +379,11 @@ def gameplay():
 	start_game()
 	while not over:
 		screen.fill(background_col)
-		t1=threading.Thread(target=T_Rex,args=())
-		t2=threading.Thread(target=ground,args=())
-		t3=threading.Thread(target=cactus,args=())
-		t4=threading.Thread(target=score,args=())
-		t5=threading.Thread(target=cloud,args=())
-		t2.start()
-		t1.start()
-		t3.start()
-		t4.start()
-		t5.start()
-		t1.join()
-		t2.join()
-		t3.join()
-		t4.join()
-		t5.join()
+		ground()
+		T_Rex()
+		cactus()
+		score()
+		cloud()
 		sprite_list=["dinoImg","dinobacklegImg","dinofrontlegImg"]
 	#	temp_list=pygame.sprite.spritecollide(cactusImg,sprite_list,False)
 	#	print dinoImg.sprite.colliderect(cactusImg.rect);
